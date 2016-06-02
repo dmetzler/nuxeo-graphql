@@ -19,7 +19,7 @@ public class GraphQLServiceImpl implements GraphQLService {
         @Override
     public Object query(CoreSession session, String gqlQuery) {
 
-        ExecutionResult result = new GraphQL(sm.getNuxeoSchema(session)).execute(gqlQuery);
+        ExecutionResult result = new GraphQL(sm.getNuxeoSchema()).execute(gqlQuery, session);
         if (result.getErrors().size() > 0) {
             throw new NuxeoException(Joiner.on(", ").join(result.getErrors()));
         }

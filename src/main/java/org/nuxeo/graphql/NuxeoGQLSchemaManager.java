@@ -38,6 +38,8 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInterfaceType;
+import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLObjectType.Builder;
 import graphql.schema.GraphQLSchema;
@@ -57,16 +59,27 @@ public class NuxeoGQLSchemaManager {
     }
 
     private GraphQLObjectType buildQueryType() {
-        return newObject().name("RootQueryType").field(getDocumentTypeField()).build();
+        return newObject().name("RootQueryType")
+                .field(getDocumentQueryTypeField())
+                .field(getNXQLQueryTypeField()).build();
 
     }
+
+    private GraphQLFieldDefinition getNXQLQueryTypeField() {
+        return newFieldDefinition().name("documents")
+                .type(new GraphQLList(documentInterface))
+                .argument(new GraphQLArgument("nxql", new GraphQLNonNull(GraphQLString)))
+                .dataFetcher(getNxqlQueryFetcher())
+                .build();
+    }
+
 
     /**
      * Builds the document query type.
      *
      * @return
      */
-    private GraphQLFieldDefinition getDocumentTypeField() {
+    private GraphQLFieldDefinition getDocumentQueryTypeField() {
 
         return newFieldDefinition().name("document")
                                    .type(documentInterface)
@@ -123,6 +136,12 @@ public class NuxeoGQLSchemaManager {
 
     }
 
+    /**
+     * Creates a GQL type for a Nuxeo schema
+     *
+     * @param schemaName
+     * @return
+     */
     private GraphQLObjectType typeForSchema(String schemaName) {
         SchemaManager sm = Framework.getService(SchemaManager.class);
         Schema s = sm.getSchema(schemaName);
@@ -211,13 +230,32 @@ public class NuxeoGQLSchemaManager {
 
     }
 
+    private DataFetcher getNxqlQueryFetcher() {
+        return new DataFetcher() {
+
+            @Override
+            public Object get(DataFetchingEnvironment environment) {
+                String nxql = environment.getArgument("nxql");
+                Object ctx = environment.getContext();
+                if (ctx instanceof CoreSession) {
+                    return ((CoreSession) ctx).query(nxql);
+                }
+                return null;
+            }
+        };
+    }
+
+
     private DataFetcher getSchemaFetcher(final Schema schema) {
         return new DataFetcher() {
 
             @Override
             public Object get(DataFetchingEnvironment environment) {
-                DocumentModel doc = (DocumentModel) environment.getSource();
-                return doc.getDataModel(schema.getName());
+                if (environment.getSource() instanceof DocumentModel) {
+                    DocumentModel doc = (DocumentModel) environment.getSource();
+                    return doc.getDataModel(schema.getName());
+                }
+                return null;
             }
 
         };
@@ -225,14 +263,15 @@ public class NuxeoGQLSchemaManager {
 
     private DataFetcher getDocPropertyFetcher() {
         return new DataFetcher() {
-
             public Object get(DataFetchingEnvironment environment) {
                 String fieldName = environment.getFields().get(0).getName();
-                DocumentModel doc = (DocumentModel) environment.getSource();
-                if ("path".equals(fieldName)) {
-                    return doc.getPathAsString();
-                } else if ("id".equals(fieldName)) {
-                    return doc.getId();
+                if (environment.getSource() instanceof DocumentModel) {
+                    DocumentModel doc = (DocumentModel) environment.getSource();
+                    if ("path".equals(fieldName)) {
+                        return doc.getPathAsString();
+                    } else if ("id".equals(fieldName)) {
+                        return doc.getId();
+                    }
                 }
                 return null;
             }

@@ -1,0 +1,21 @@
+<!-- See documentation at http://doc.nuxeo.com/x/HgIz -->
+<package type="addon" name="nuxeo-graphql" version="@VERSION@">
+  <title>Nuxeo GraphQL</title>
+  <description>
+    <p>This addons adds a /nuxeo/api/v1/gql endpoint to query the Nuxeo repository in GraphQL</p>
+  </description>
+  <home-page>http://doc.nuxeo.com/</home-page>
+  <vendor>Nuxeo</vendor>
+  <installer restart="true" />
+  <uninstaller restart="true" />
+  <nuxeo-validation>nuxeo_certified</nuxeo-validation>
+  <production-state>production_ready</production-state>
+  <supported>false</supported>
+  <platforms>
+    <platform>cap-@DISTRIB_VERSION@</platform>
+    <platform>cap-@DISTRIB_VERSION@-HF*</platform>
+  </platforms>
+  <license>LGPL 2.1</license>
+  <license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
+  <visibility>PUBLIC</visibility>
+</package>

@@ -1,0 +1,41 @@
+<project name="nuxeo-showcase-content-assembly"
+         default="build"
+         xmlns:nx="urn:nuxeo-build"
+         xmlns:artifact="urn:nuxeo-artifact">
+  <taskdef resource="org/nuxeo/build/antlib.xml" uri="urn:nuxeo-build" />
+  <taskdef resource="org/nuxeo/build/artifact/antlib.xml" uri="urn:nuxeo-artifact" />
+
+  <property name="outdir" value="${maven.project.build.directory}" />
+
+  <target name="build" description="Build Nuxeo Showcase Content Marketplace package">
+    <tstamp />
+    <delete failonerror="false" dir="${outdir}/marketplace" />
+    <mkdir dir="${outdir}/marketplace" />
+    <copy todir="${outdir}/marketplace">
+      <fileset dir="src/main/resources" />
+      <filterset>
+        <filter token="VERSION" value="${maven.project.version}" />
+        <filter token="DISTRIB_VERSION" value="${nuxeo.distribution.version}" />
+      </filterset>
+    </copy>
+
+    <copy todir="${outdir}/marketplace/install/bundles">
+      <!-- Your bundles -->
+      <artifact:file key="org.nuxeo.graphql:nuxeo-graphql-core" />
+      <artifact:file key="org.nuxeo.graphql:nuxeo-graphql-rest" />
+    </copy>
+
+    <copy todir="${outdir}/marketplace/install/lib">
+      <!-- Your bundles -->
+      <artifact:file key="com.graphql-java:graphql-java" />      
+      <artifact:file key="org.antlr:antlr4-runtime" />
+    </copy>
+
+
+
+    <zip destfile="${outdir}/${maven.project.artifactId}-${maven.project.version}.zip"
+         basedir="${outdir}/marketplace" />
+    <artifact:attach file="${outdir}/${maven.project.artifactId}-${maven.project.version}.zip" type="zip" />
+  </target>
+
+</project>

@@ -1,8 +1,8 @@
 package org.nuxeo.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -89,7 +89,7 @@ public class GraphQLServiceTest {
     public void should_be_able_to_query_docs() throws Exception {
         String nxql = "SELECT * FROM Document";
         String query ="{documents(nxql:\"" + nxql + "\") { path}}";
-        Map<String, Object> result = (Map<String, Object>) gql.query(session, query);
-        assertThat(result).hasSameSizeAs(session.query(nxql));
+        Map<String, List<Object>> result = (Map<String, List<Object>>) gql.query(session, query);
+        assertThat(result.get("documents")).hasSameSizeAs(session.query(nxql));
     }
 }

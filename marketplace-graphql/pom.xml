@@ -1,46 +1,46 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
-
   <parent>
-    <groupId>org.nuxeo</groupId>
-    <artifactId>nuxeo-addons-parent</artifactId>
+    <groupId>org.nuxeo.ecm.distribution</groupId>
+    <artifactId>nuxeo-distribution</artifactId>
     <version>8.2</version>
   </parent>
 
-  <groupId>org.nuxeo.graphql</groupId>
-  <artifactId>nuxeo-graphql-parent</artifactId>
-  <name>Nuxeo GraphQL - parent</name>
-  <version>0.0.1-SNAPSHOT</version>
+  <groupId>org.nuxeo.ecm.platform</groupId>
+  <artifactId>marketplace-nuxeo-graphql-parent</artifactId>
   <packaging>pom</packaging>
+  <name>Nuxeo GraphQL - Nuxeo package - Parent</name>
+  <version>0.0.1-SNAPSHOT</version>
 
   <modules>
-    <module>nuxeo-graphql-core</module>
-    <module>nuxeo-graphql-rest</module>
-    <module>marketplace-graphql</module>
+    <module>marketplace</module>
   </modules>
+
+
+  <properties>
+    <graphql.version>0.0.1-SNAPSHOT</graphql.version>
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>ftest</id>
+      <modules>
+        <module>ftest/webdriver</module>
+      </modules>
+    </profile>
+  </profiles>
 
   <dependencyManagement>
     <dependencies>
-
       <dependency>
         <groupId>org.nuxeo.graphql</groupId>
         <artifactId>nuxeo-graphql-core</artifactId>
-        <version>${project.version}</version>
+        <version>${graphql.version}</version>        
       </dependency>
-
       <dependency>
         <groupId>org.nuxeo.graphql</groupId>
         <artifactId>nuxeo-graphql-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-
-      <dependency>
-        <groupId>com.graphql-java</groupId>
-        <artifactId>graphql-java</artifactId>
-        <version>2.0.0</version>
+        <version>${graphql.version}</version>        
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -68,6 +68,5 @@
       </snapshots>
     </repository>
   </repositories>
-
 
 </project>

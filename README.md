@@ -66,12 +66,10 @@ another query :
 
 # Run on docker ?
 
-It's far more simple with Docker and the Nuxeo image.
+It's far more simple with Docker Compose and the Nuxeo image.
   
     mvn clean install
-    docker build -t nuxeo/graphql-conf .
-    docker run --name graphql-conf nuxeo/graphql-conf
-    docker run -it --volumes-from graphql-conf -p 8080:8080 --rm  --name nuxeo-graphql nuxeo:8.2
+    docker-compose up -d
 
 Then you can run your first query : http://$DOCKER_HOST:8080/nuxeo/api/v1/gql?q={documents(nxql:%22SELECT%20*%20FROM%20Document%22)%20{%20id%20path%20__typename}}
 

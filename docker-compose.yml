@@ -1,0 +1,9 @@
+graphql-conf:
+  build: .
+
+nuxeo-graphql:
+  image: nuxeo:8.2
+  volumes_from:
+    - graphql-conf
+  ports:
+    - "8080:8080"

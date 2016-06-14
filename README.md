@@ -64,6 +64,27 @@ another query :
           }
         }
 
+with the `children` field :
+
+    {
+      
+        documents(nxql: "SELECT * From Workspace") {
+            id
+            path
+            children {
+                id
+                path
+                ...on Note {
+                    dc {
+                        title
+                    }
+                }
+            }
+        }
+      
+    }
+
+
 # Run on docker ?
 
 It's far more simple with Docker Compose and the Nuxeo image.

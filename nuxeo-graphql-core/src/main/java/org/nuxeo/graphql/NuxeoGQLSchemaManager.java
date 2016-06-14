@@ -44,6 +44,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLObjectType.Builder;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
+import graphql.schema.GraphQLTypeReference;
 import graphql.schema.TypeResolver;
 
 public class NuxeoGQLSchemaManager {
@@ -60,19 +61,19 @@ public class NuxeoGQLSchemaManager {
 
     private GraphQLObjectType buildQueryType() {
         return newObject().name("RootQueryType")
-                .field(getDocumentQueryTypeField())
-                .field(getNXQLQueryTypeField()).build();
+                          .field(getDocumentQueryTypeField())
+                          .field(getNXQLQueryTypeField())
+                          .build();
 
     }
 
     private GraphQLFieldDefinition getNXQLQueryTypeField() {
         return newFieldDefinition().name("documents")
-                .type(new GraphQLList(documentInterface))
-                .argument(new GraphQLArgument("nxql", new GraphQLNonNull(GraphQLString)))
-                .dataFetcher(getNxqlQueryFetcher())
-                .build();
+                                   .type(new GraphQLList(documentInterface))
+                                   .argument(new GraphQLArgument("nxql", new GraphQLNonNull(GraphQLString)))
+                                   .dataFetcher(getNxqlQueryFetcher())
+                                   .build();
     }
-
 
     /**
      * Builds the document query type.
@@ -106,6 +107,11 @@ public class NuxeoGQLSchemaManager {
                                                                          .name("id")
                                                                          .dataFetcher(getDocPropertyFetcher())
                                                                          .build())
+                                              .field(newFieldDefinition().type(new GraphQLList(new GraphQLTypeReference("document")))
+                                                                         .name("children")
+                                                                         .dataFetcher(getChildrenDataFetcher())
+                                                                         .build())
+
                                               .typeResolver(getNuxeoDocumentTypeResolver())
                                               .build();
 
@@ -121,7 +127,12 @@ public class NuxeoGQLSchemaManager {
                               .field(newFieldDefinition().type(GraphQLString)//
                                                          .name("id")
                                                          .dataFetcher(getDocPropertyFetcher())
-                                                         .build());
+                                                         .build())
+                                .field(newFieldDefinition().type(new GraphQLList(new GraphQLTypeReference("document")))
+                                        .name("children")
+                                        .dataFetcher(getChildrenDataFetcher())
+                                        .build());
+
                 for (Schema schema : type.getSchemas()) {
                     String name = schema.getNamespace().prefix;
                     name = StringUtils.isNotBlank(name) ? name : schema.getName();
@@ -245,6 +256,24 @@ public class NuxeoGQLSchemaManager {
         };
     }
 
+    private DataFetcher getChildrenDataFetcher() {
+        return new DataFetcher() {
+            @Override
+            public Object get(DataFetchingEnvironment environment) {
+                Object ctx = environment.getContext();
+                if (ctx instanceof CoreSession) {
+
+                    if (environment.getSource() instanceof DocumentModel) {
+                        DocumentModel doc = (DocumentModel) environment.getSource();
+                        return ((CoreSession) ctx).getChildren(doc.getRef());
+                    }
+                    return null;
+                }
+                return null;
+            }
+
+        };
+    }
 
     private DataFetcher getSchemaFetcher(final Schema schema) {
         return new DataFetcher() {

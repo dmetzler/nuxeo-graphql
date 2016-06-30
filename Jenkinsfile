@@ -1,5 +1,9 @@
 node {
+   
    stage 'Checkout'
+
+   // Get some code from a GitHub repository
+   git url: 'https://github.com/dmetzler/nuxeo-graphql.git'
 
    def mvnHome = tool 'M3'
 
